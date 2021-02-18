@@ -1,0 +1,61 @@
+using System;
+
+namespace SA_1_2
+{
+    class FindKeyOperation
+    {
+        public char FindKey(string line1, string line2)
+        {
+            char n= '\0';
+
+            for (int i = 0; i < line1.Length; i++)
+            {
+                for (int ii = line2.Length-1; ii >= 0; ii--)
+                {
+                    n = line1[i];
+                    if (line1[i] == line2[ii])
+                    {
+                        n = '\0';
+                        break;
+                    }
+                }
+                if (n != '\0')
+                {
+                    break;
+                }
+            }
+            return n;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            char n = '\0';
+            string line1;
+            string line2;
+            Console.Write("\n Введите строку 1: ");
+            line1 = Console.ReadLine();
+            Console.Write("\n Введите строку 2: ");
+            line2 = Console.ReadLine();
+
+            FindKeyOperation FindKey_func = new FindKeyOperation();
+            n = FindKey_func.FindKey(line1, line2);
+            if (n == '\0')
+            {
+                n = FindKey_func.FindKey(line2, line1);
+            }
+            if (n == '\0' && line2.Length==0 && line1.Length > 0)
+            {
+                n = line1[0];
+            }
+            else if (n == '\0' && line1.Length == 0 && line2.Length > 0)
+            {
+                n = line2[0];
+            }
+            Console.Write("\n овтет: " + n);
+            Console.ReadKey();
+        }
+    }
+}
