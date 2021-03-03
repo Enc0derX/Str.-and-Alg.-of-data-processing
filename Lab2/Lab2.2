@@ -1,1 +1,42 @@
+using System;
+using System.Collections.Generic;
 
+
+namespace SA_2_2
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int N = 0, min_num=0;
+            Console.Write("Введите N - размер стэка (>0): ");
+            string input = Console.ReadLine();
+            N = Convert.ToInt32(input);
+
+            Random rnd = new Random();
+            Stack<int> numbers = new Stack<int>();
+            for (int i = 0; i < N; i++)
+            {
+                numbers.Push(rnd.Next(10, 50));
+                Console.WriteLine("- " + numbers.Peek());
+            }
+
+            min_num = numbers.Peek(); //вершина стэка внизу
+
+            using (var enumerator = numbers.GetEnumerator())
+            {
+                //пока можем получить очередной элемент выполняем цикл
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Current < min_num)
+                    {
+                        min_num = enumerator.Current;
+                    }
+                }
+            }
+
+            Console.WriteLine("Ответ:" + min_num);
+            Console.ReadKey();
+        }
+    }
+}
