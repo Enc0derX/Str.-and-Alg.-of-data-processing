@@ -1,1 +1,142 @@
+using System;
+using System.Collections.Generic;
 
+namespace Collections
+{
+    class Person
+    {
+        public string Name { get; set; }
+        public double Distance { get; set; }
+        public double Mass{ get; set; }
+
+        public Person(string name, double distance, double mass)
+        {
+            Name = name;
+            Distance = distance;
+            Mass = mass;
+        }
+    }
+
+    class Program
+    {
+        static string menu =
+            "1. Добавление планеты\n" +
+            "2. Вывести список всех планет\n" +
+            "3. Сортировка по возрастанию масс\n" +
+            "Введите пункт меню: ";
+        static void Main(string[] args)
+        {
+            LinkedList<Person> persons = new LinkedList<Person>();
+            for (; ; )
+            {
+                Console.Clear();
+                Console.Write(menu);
+                switch (Console.ReadLine().Trim())
+                {
+                    case "1":
+                        Console.Clear();
+                        AddPlanet(persons);
+                        break;
+
+                    case "2":
+                        Console.Clear();
+                        Print(persons);
+                        break;
+
+                    case "3":
+                        Console.Clear();
+                        Sort(persons);
+                        break;
+                }
+            }
+            static void AddPlanet(LinkedList<Person> persons)
+        {
+            string input_name = "", input_distance = "", input_mass = "";
+            Console.WriteLine("Введите название планеты: ");
+            input_name = Console.ReadLine();
+            while (input_name == "" || input_name.Trim() == string.Empty)
+                {
+                    Console.Clear(); Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Вы неправильно ввели данные о названии планеты, введите заного:"); Console.ResetColor();
+                    input_name = Console.ReadLine();
+                    input_name = input_name.Trim();
+                }
+            Console.WriteLine("Введите дистанцию от Солнца: ");
+            for (; ; )
+                {
+                    input_distance = Console.ReadLine();
+                    try
+                    {
+                        double num = Convert.ToDouble(input_distance);
+                        if (num >=0)
+                        {break;}
+                        else
+                        {
+                            Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Неправильно введены данные о дистанции, введите заного:"); Console.ResetColor();
+                        }
+                    }
+                    catch
+                    {
+                        Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Неправильно введены данные о дистанции, введите заного:"); Console.ResetColor();
+                    }
+                }
+            Console.WriteLine("Введите массу планеты: ");
+            for (; ; )
+            {
+                    input_mass = Console.ReadLine();
+                try
+                {
+                    double num = Convert.ToDouble(input_mass);
+                    if (num >= 0)
+                    {break;}
+                    else
+                    {
+                        Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Неправильно введены данные о массе, введите заного:"); Console.ResetColor();
+                    }
+                }
+                catch
+                {
+                    Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Неправильно введены данные о массе, введите заного:"); Console.ResetColor();
+                }
+            }
+            persons.AddLast(new Person(input_name, Convert.ToDouble(input_distance), Convert.ToDouble(input_mass)));
+            Console.WriteLine("Планета добавлена. Нажмите любую кнопку чтобы продолжить..");
+            Console.ReadKey();
+        }
+            static void Print(LinkedList<Person> persons)
+            {
+                Console.Clear();
+                Console.WriteLine("-----------------------------------------------------------");
+                LinkedListNode<Person> node; //в прямом направлении
+                for (node = persons.First; node != null; node = node.Next)
+                    Console.WriteLine(node.Value.Name + "  |  " + node.Value.Distance + "  |  " + node.Value.Mass);
+                Console.WriteLine("-----------------------------------------------------------");
+                Console.WriteLine("Выведены все изделия. Нажмите любую кнопку чтобы продолжить..");
+                Console.ReadKey();
+            }
+            static void Sort(LinkedList<Person> persons)
+            {
+                LinkedListNode<Person> node;
+                Console.Clear();
+                for (int j = 0; j < persons.Count; j++) 
+                {
+                    for (node = persons.First; node != null; node = node.Next)
+                    {
+                        if (node.Next != null)
+                        {
+                            Person temp2 = node.Next.Value;
+                            Person temp = node.Value;
+                            if (node.Value.Mass > node.Next.Value.Mass)
+                            { 
+                                node.Value = temp2;
+                                node.Next.Value = temp;
+                            }
+                        }
+                    }
+                }
+                Console.WriteLine("Сортировка по массе выполнена. Нажмите любую кнопку чтобы продолжить..");
+                Console.ReadKey();
+            }
+        }
+    }
+}
