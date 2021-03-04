@@ -1,0 +1,447 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Товар
+{
+    // Класс узла односвязного списка
+    class Node
+    {
+        private string reg_name; // Название региона
+        private string prod_name; // Название товара
+        private int scale; // площадь га
+        private float productivity; // урожайность
+        private int cost; // Стоимость товара за 1 кг
+        private int losses; // потери в %тах
+        private int prod_cost; // Стоимость продукта
+        private string data; // дата сбора
+
+        // Ссылка на следующий узел или null для последнего узла
+        private Node link;
+
+        // Свойства
+        public string Reg_name
+        { get { return reg_name; } set { reg_name = value; } }
+        public string Prod_name
+        { get { return prod_name; } set { prod_name = value; } }
+        public int Scale
+        { get { return scale; } set { scale = value; } }
+        public float Productivity
+        { get { return productivity; } set { productivity = value; } }
+        public int Cost
+        { get { return cost; } set { cost = value; } }
+        public int Losses
+        { get { return losses; } set { losses = value; } }
+        public int Prod_cost
+        { get { return prod_cost; } set { prod_cost = value; } }
+        public string Data
+        { get { return data; } set { data = value; } }
+
+        public Node Link
+        { get { return link; } set { link = value; } }
+
+        // Конструктор
+        public Node(string reg_name, string prod_name, int scale, float productivity, int cost, int losses, int prod_cost, string data, Node link)
+        {
+            Reg_name = reg_name;
+            Prod_name = prod_name;
+            Scale = scale;
+            Productivity = productivity;
+            Cost = cost;
+            Losses = losses;
+            Prod_cost = prod_cost;
+            Data = data;
+            Link = link;
+        }
+    }
+
+    // Класс односвязного списка
+    class SingleLinkedList
+    {
+        // Ссылка на первый узел списка
+        private Node first;
+
+        // Количество ключей сортировки
+        private int cnt;
+
+        // Ключи сортировки
+        private int[] key = new int[3];
+
+        // Конструктор для создания пустого списка
+        public SingleLinkedList()
+        {
+            first = null;
+        }
+
+        // Получить тип сортировки
+        private void TypeSort()
+        {
+            string str;
+            char[] separators = new char[] { ' ', '\t' };
+            string[] word = { "район", "урожайность", "дата" };
+            string[] subs = null;
+            int j, k;
+
+            do
+            {
+                Console.Write("Введите тип сортировки (район урожайность дата) в любом количестве и порядке: ");
+                if ((str = Console.ReadLine().Trim()) == "")
+                {
+                    Console.WriteLine("Не задан тип сортировки");
+                    continue;
+                }
+
+                // Разбиваем введенную строку на параметры, разделенные пустыми символами
+                subs = str.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+
+                if (subs.Length > 3)
+                {
+                    Console.WriteLine("Слишком много ключей сортировки");
+                    continue;
+                }
+
+                // Контролируем ключи сортировки
+                for (cnt = 0; cnt < subs.Length; ++cnt)
+                {
+                    // Поиск ключа
+                    for (j = 0; j < 3 && subs[cnt] != word[j]; ++j)
+                        ;
+                    if (j == 3)
+                    {
+                        Console.WriteLine("Ошибочный ключ сортировки {0}", subs[cnt]);
+                        break;
+                    }
+
+                    // Проверка дубликатности ключа
+                    for (k = 0; k < cnt && j != key[k]; ++k)
+                        ;
+                    if (k != cnt)
+                    {
+                        Console.WriteLine("Дубликатный ключ сортировки {0}", subs[cnt]);
+                        break;
+                    }
+
+                    // Сохраняем тип ключа
+                    key[cnt] = j;
+                }
+            } while (cnt != subs.Length);
+        }
+
+        // Сравнение двух узлов списка в соответствии с ключами сортировки
+        // return: < 0, если первый узел меньше второго
+        //         > 0, если первый узел больше второго
+        //         ==0, если узлы равны
+        private int CmpNode(Node p1, Node p2)
+        {
+            int i, code;
+
+            // Просматриваем все ключи в порядке их задания
+            for (i = 0; i < cnt; ++i)
+            {
+                // Определяем тип ключа и выполняем
+                // соответствующее сравнение
+                switch (key[i])
+                {
+                    // Сравнение по району
+                    case 0:
+                        if ((code = p1.Reg_name.CompareTo(p2.Reg_name)) != 0)
+                            return code;
+                        continue;
+
+                    // Сравнение по урожайности
+                    case 1:
+                        if (p1.Productivity < p2.Productivity)
+                            return -1;
+                        if (p1.Productivity > p2.Productivity)
+                            return 1;
+                        continue;
+                }
+
+                // Сравнение по дате
+                if ((code = p1.Data.CompareTo(p2.Data)) != 0)
+                    return code;
+            }
+
+            return 0;
+        }
+
+        // Добавить в начало списка товар
+        public void InsertBeforeFirst(string reg_name, string prod_name, int scale, float productivity, int cost, int losses, int prod_cost, string data)
+        {
+            first = new Node(reg_name, prod_name, scale, productivity, cost, losses, prod_cost, data, first);
+        }
+
+        // Печать всех товаров
+        public void Print(int search, string searchable_word) //searchable_word и search посылаются только с поиска... для обычного вывода всех продуктов нам  ничего не надо
+        {
+            int size_r_name = 0, size_p_name = 0, size_scale = 0, size_productivity = 0, size_cost = 0, size_losses = 0, size_p_cost = 0, size_data = 0, w;
+            // search 0 простой вывод всех продуктов, 1,2 или 3 - по разделу поиск по ключевому слову... 
+            Node q;
+            string fmt;
+            if (first == null)
+                return;
+            // Предварительный просмотр списка товаров для
+            // определения максимальных размеров колонок
+            // наименования и стоимости товаров
+            for (q = first; q != null; q = q.Link)
+            {
+                if (q.Reg_name.Length > size_r_name)
+                    size_r_name = q.Reg_name.Length;
+                if (q.Prod_name.Length > size_p_name)
+                    size_p_name = q.Prod_name.Length;
+                if ((w = q.Scale.ToString().Length) > size_scale)
+                    size_scale = w;
+                if ((w = q.Productivity.ToString().Length) > size_productivity)
+                    size_productivity = w;
+                if ((w = q.Cost.ToString().Length) > size_cost)
+                    size_cost = w;
+                if ((w = q.Losses.ToString().Length) > size_losses)
+                    size_losses = w;
+                if ((w = q.Prod_cost.ToString().Length) > size_p_cost)
+                    size_p_cost = w;
+                if (q.Data.Length > size_data)
+                    size_data = q.Data.Length;
+            }
+
+
+
+            // Печать заголовка таблицы (названия колонок центрируются)
+            Console.WriteLine("-------------------------------------------------------------------------------------------");
+            Console.WriteLine("                          Список товаров     (головной элеент снизу)                      ");
+            Console.WriteLine("-------------------------------------------------------------------------------------------");
+
+            // Форматная строка для печати таблицы
+            fmt = "|{0,-" + size_r_name.ToString() + "}|{1,-" + size_p_name.ToString() + "}|{2,-" + size_scale.ToString() + "}|{3,-" + size_productivity.ToString() + "}|{4,-" + size_cost.ToString() + "}|{5,-" + size_losses.ToString() + "}|{6,-" + size_p_cost.ToString() + "}|{7,-" + size_data.ToString() + "}|";
+
+            // Печать самой таблицы
+            for (q = first; q != null; q = q.Link)
+            {
+                if (search == 0)
+                {
+                    Console.WriteLine(String.Format(fmt, q.Reg_name, q.Prod_name, q.Scale, q.Productivity, q.Cost, q.Losses, q.Prod_cost, q.Data));
+                }
+                else if (search == 1)
+                {
+                    if (q.Reg_name == searchable_word)
+                    {
+                        Console.WriteLine(String.Format(fmt, q.Reg_name, q.Prod_name, q.Scale, q.Productivity, q.Cost, q.Losses, q.Prod_cost, q.Data));
+                    }
+                }
+                else if (search == 2)
+                {
+                    if (q.Productivity == Convert.ToDouble(searchable_word))
+                    {
+                        Console.WriteLine(String.Format(fmt, q.Reg_name, q.Prod_name, q.Scale, q.Productivity, q.Cost, q.Losses, q.Prod_cost, q.Data));
+                    }
+                }
+            }
+
+            // Заключительная строка
+            Console.WriteLine("-------------------------------------------------------------------------------------------");
+        }
+
+        // Сортировка выборкой списка по стоимости товара
+        public void Sort()
+        {
+            Node newh = null, max, prev, cur, pmax = null;
+
+            // Список пуст?
+            if (first == null)
+                return;
+
+            // Получить тип сортировки
+            TypeSort();
+
+            while (first != null)
+            {
+                // Начальный максимум
+                max = prev = first;
+                // Поиск максимума во входном списке
+                for (cur = first.Link; cur != null; prev = cur, cur = cur.Link)
+                {
+                    if (CmpNode(cur, max) > 0)
+                    {
+                        // Сохраняем ссылку максимума и ссылку предыдущего элемента
+                        max = cur;
+                        pmax = prev;
+                    }
+                }
+
+                // Исключение максимума из входного списка
+                if (max == first)
+                    first = first.Link;
+                else
+                    pmax.Link = max.Link;
+
+                // Вставка максимума начало выходного списка
+                max.Link = newh;
+                newh = max;
+            }
+            first = newh;
+        }
+
+        public void Search(ConsoleKeyInfo key, SingleLinkedList list)
+        {
+            Console.Clear();
+            Node q;
+            string searchable_word;
+            switch (key.Key)
+            {
+                case ConsoleKey.D1:
+                    Console.WriteLine("\nВведите слово для поиска по району\n");
+                    searchable_word = Console.ReadLine();
+                    Print(1, searchable_word);
+                    break;
+                case ConsoleKey.D2:
+                    Console.WriteLine("\nВведите слово для поиска по продуктивности\n");
+                    searchable_word = Console.ReadLine();
+                    Print(2, searchable_word);
+                    break;
+                case ConsoleKey.D3:
+                    Console.WriteLine("Введите число(вещественное или целое) для поиска по дате\n");
+                    searchable_word = Console.ReadLine();
+                    break;
+                default:
+                    Console.Write("Неправильно задан поиск... ");
+                    break;
+            }
+        }
+
+        // Вернуть true, если список пуст
+        public bool Empty()
+        {
+            return first == null;
+        }
+    }
+
+    class Program
+    {
+        static string menu =
+            "1. Добавление товара\n" +
+            "2. Печать всех товаров\n" +
+            "3. Поиск\n" +
+            "4. Сортировка товаров\n" +
+            "5. Выход\n" +
+            "Введите пункт меню: ";
+
+        static void Main(string[] args)
+        {
+            SingleLinkedList list = new SingleLinkedList();
+            string reg_name = "", prod_name = "", data = "";
+            int cost = 0, scale = 0, losses = 0, prod_cost = 0;
+            float productivity = 0;
+            for (; ; )
+            {
+                // Печать меню и ввод пункта меню
+                Console.Clear();
+                Console.Write(menu);
+                switch (Console.ReadLine().Trim())
+                {
+                    case "1":
+                        Console.Write("Название региона : ");
+                        if ((reg_name = Console.ReadLine().Trim()) == "")
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Название товара не задано, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        Console.Write("Название товара : ");
+                        if ((prod_name = Console.ReadLine().Trim()) == "")
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Название товара не задано, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        Console.Write("площадь (целое число) : ");
+                        if (!Int32.TryParse(Console.ReadLine(), out scale) || scale < 0)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("площадь не задана, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        Console.Write("урожайность (вещественное или целое число): ");
+                        if (!float.TryParse(Console.ReadLine(), out productivity) || productivity < 0)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("урожайность не задана, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        Console.Write("цена за 1 кг (целое число) : ");
+                        if (!Int32.TryParse(Console.ReadLine(), out cost) || cost <= 0)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("цена за 1 кг не задано, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        Console.Write("потери при транспортировке (%) (целое число от 0 до 100) : ");
+                        if (!Int32.TryParse(Console.ReadLine(), out losses) || losses < 0 || losses > 100)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("потери при транспортировке (%) не задана, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        Console.Write("стоимость продукта (целое число) : ");
+                        if (!Int32.TryParse(Console.ReadLine(), out prod_cost) || prod_cost < 0)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("стоимость продукта, не задана, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        Console.Write("дата сборка : ");
+                        if ((data = Console.ReadLine().Trim()) == "")
+                        {
+                            Console.Clear();
+                            Console.WriteLine("дата не задана, вводите данные продукта заного!");
+                            goto case "1";
+                        }
+                        else
+                        {
+                            list.InsertBeforeFirst(reg_name, prod_name, scale, productivity, cost, losses, prod_cost, data);
+                            Console.WriteLine("Продукт добавлен");
+                        }
+                        break;
+
+                    case "2":
+                        if (list.Empty())
+                            Console.WriteLine("Нет ни одного товара");
+                        else
+                            list.Print(0, "");
+                        break;
+                    case "3":
+                        if (list.Empty())
+                        {
+                            Console.WriteLine("Нет ни одного товара");
+                            break;
+                        }
+                        else
+                        {
+                            Console.Write("Поиск товара (нажмите на клавину 1-3 для выбора):  1-поиск по рейону    2-поиск по урожайности    3-поиск по дате сбора: ");
+                            ConsoleKeyInfo key = Console.ReadKey();
+                            list.Search(key, list);
+                        }
+                        break;
+                    case "4":
+                        if (list.Empty())
+                            Console.WriteLine("Нет ни одного товара");
+                        else
+                        {
+                            list.Sort();
+                            Console.WriteLine("Сортировка выполнена");
+                        }
+                        break;
+
+                    case "5":
+                        return;
+
+                    default:
+                        Console.WriteLine("Ошибочен пункт меню");
+                        break;
+                }
+                Console.Write("Для продолжения нажмите любую клавишу...");
+                Console.ReadKey();
+            }
+        }
+    }
+}
