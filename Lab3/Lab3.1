@@ -1,0 +1,62 @@
+using System;
+using System.Collections.Generic;
+
+namespace Collections
+{
+    class Numbers
+    {
+        public double number { get; set; }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Queue<Numbers> numbers = new Queue<Numbers>();
+            string number="";
+            double middle=0;
+            Console.WriteLine("Добавление чисел (напишите stop для звершения добавления): ");
+            for (; ; )
+            {
+                Console.Write("Ввод: ");
+                number=Console.ReadLine();
+                if (number == "stop")
+                {
+                    break;
+                }
+                else
+                    numbers.Enqueue(new Numbers() { number = Convert.ToDouble(number) });
+            }
+            Console.Clear();
+            Console.WriteLine("---------------------Исходные-----------------------");
+            middle = Print(numbers, middle);
+            middle = Math.Abs(middle / numbers.Count);
+            Console.WriteLine("----------------------------------------------------");
+            if (numbers.Count > 0)
+                Console.WriteLine(middle + " - среднее арифметическое");
+            else
+                Console.WriteLine("исходный список чисел пустой");
+            Console.WriteLine("------------------------После-----------------------");
+            int i = 0;
+            foreach (Numbers n in numbers)
+            {
+                i = 1 + i;
+                if (i%2==0)
+                {
+                    n.number = middle;
+                }
+            }
+            Print(numbers, middle);
+            Console.ReadKey();
+
+        }
+        static double Print(Queue<Numbers> numbers, double middle)
+        {
+            foreach (Numbers n in numbers)
+            {
+                Console.WriteLine(n.number);
+                middle = middle + n.number;
+            }
+            return middle;
+        }
+    }
+}
