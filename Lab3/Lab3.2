@@ -1,0 +1,107 @@
+using System;
+using System.Collections.Generic;
+
+namespace _3._2
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string item = "\0";
+            string type = "\0";
+            List<dynamic> list = new List<dynamic>();
+            List<string> set = new List<string>();
+            Console.WriteLine("Добавление произвольных данных в список. Напишите stop для завершения");
+            for (; ; )
+            {
+                Console.Write("-> ");
+                item = Console.ReadLine();
+                if (item == "stop")
+                {
+                    item = null;
+                    break;
+                }
+                else if (item != "stop" || item != null)
+                {
+                    list.Add(item);
+                }
+            }
+            list_to_set(list, set, type);
+            Console.WriteLine("В какой тип нужно преобразовать множества ( int(1),float(1,1),string(\"1\"),char(\'1\') )? : ");
+            Console.Write("-> ");
+            type = Console.ReadLine();
+            if (type == "int")
+            {
+                foreach (var i in list)
+                {
+                    try
+                    {
+                        if (Convert.ToInt32(i) % 1 == 0)
+                            set.Add(i);
+                    }
+                    catch
+                    {}
+                }
+            }
+            if (type == "float")
+            {
+                foreach (var i in list)
+                {
+                    try
+                    {
+                        if (Convert.ToDouble(i) % 1 == 0);
+                            set.Add(i);
+                    }
+                    catch
+                    { }
+                }
+            }
+            if (type == "string")
+            {
+                foreach (var i in list)
+                {
+                    string str = Convert.ToString(i);
+                    if (str[0]=='"' && str[str.Length-1]== '"')
+                    {
+                        str = str.Remove(0,1); str = str.Remove(str.Length - 1,1);
+                        set.Add(str);
+                    }
+                }
+            }
+            if (type == "char")
+            {
+                foreach (var i in list)
+                {
+                    string str = Convert.ToString(i);
+                    if ((str[0] == '\'') && (str[2] == '\'') && (str.Length==3))
+                    {
+                        str = str.Remove(0, 1); str = str.Remove(str.Length - 1, 1);
+                        set.Add(str);
+                    }
+                }
+            }
+            list_to_set(list, set, type);
+        }
+        static void list_to_set(List<dynamic> list, List<string> set,string type)
+        {
+            Console.Clear();
+            Console.WriteLine("\nПроизвольные данные");
+            foreach (var i in list)
+            {
+                Console.Write(i+ " | ");
+            }
+            if (set.Count>0)
+            {
+                Console.WriteLine("\nМножество типа" + type);
+            }    
+            foreach (var i in set)
+            {
+                Console.Write(i + " | ");
+            }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine("\nНажмите любую кнопку чтобы продолжить...");
+            Console.ReadKey();
+            Console.Clear();
+        }
+    }
+}
